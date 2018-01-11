@@ -1,0 +1,60 @@
+#!/bin/bash
+
+#Include main cracking functions
+# shellcheck source=/dev/null
+source "$(pwd)"/CrackingFunctions
+
+#The usernames and hashed passwords file to be tested against
+testFile=hashfile.txt
+commonFile="$(pwd)"/commonFile.txt
+dictionaryPath=/home/el5/E20925/linux.words
+bruteForceFile="$(pwd)"/BruteForceAttack.txt
+
+#Arrays that will store the required data for forthcoming attacks
+usernameArray=()
+passwordArray=()
+
+#Add usernames and passwords into separated array
+while IFS=":" read -r user pass; do
+
+	usernameArray+=("$user")
+	passwordArray+=("$pass")
+
+done < "$testFile"
+
+printf "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\n"
+printf "        s3541804 - Aedriane Hernan          \\n\\n"
+printf "              COSC1131/1133                 \\n"
+printf "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\n"
+printf "Initialising top 500 common passwords attack!\\n"
+printf "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\n"
+
+#Run commonPasswordAttack function with the common passwords text file
+commonPasswordAttack "$commonFile"
+
+printf "Common password attack has concluded!\\n"
+printf "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\n\\n"
+
+currentUserIndicator=0
+
+printf "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\n"
+printf "Commencing a Dictionary Attack!\\n"
+printf "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\n"
+
+#Run dictionaryAttack function with the linux.words file
+dictionaryAttack "$dictionaryPath"
+
+printf "Dictionary Attack has concluded!\\n"
+printf "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\n\\n"	
+
+currentUserIndicator=0
+
+printf "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\n"
+printf "Commencing Brute Force attack!\\n"
+printf "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\n"	
+
+#Run bruteForceAttack function with the Brute Force algorithm file 
+bruteForceAttack "$bruteForceFile"
+
+printf "Brute Force attack has concluded!\\n"
+printf "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\n\\n"	

@@ -1,0 +1,128 @@
+# shellcheck disable=SC2148
+#This file does not require a shebang as it not the runnable script.
+
+commonPasswordAttack()
+{
+    # shellcheck disable=SC2154
+    #passwordArray is declared in s3541804
+
+	#Iterates through passwords array. If match is found, continues to the next element. Else it will continue to the next element regardless.
+	for i in "${passwordArray[@]}"; do
+
+		printf "User: %d\\n" "$((currentUserIndicator + 1))"
+
+		printf "Searching...\\n"
+
+		while IFS= read -r guess; do 
+
+			hash=$(echo -n "$guess" | sha256sum | awk '{print $1}')
+
+			if [ "$hash" == "$i" ]; then
+
+				printf "Password Found!\\n"
+				printf "Username: %s\\n" "${usernameArray[currentUserIndicator]}"
+				printf "Password: %s\\n" "$guess"
+				printf "Searching rest of common passwords file for identical passwords for %s...\\n" "${usernameArray[currentUserIndicator]}"
+
+			fi
+
+		done < "$1"
+
+		printf "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\n"
+
+		#Iterate current user index
+		currentUserIndicator=$((currentUserIndicator + 1))
+
+	done
+
+	return 0
+}
+
+
+
+dictionaryAttack()
+{
+	#Iterates through passwords array. If match is found, continues to the next element. Else it will continue to the next element regardless.
+
+	for i in "${passwordArray[@]}"; do
+
+		printf "User: %d\\n" "$((currentUserIndicator + 1))"
+
+		printf "Searching...\\n"
+
+		while IFS= read -r guess; do 
+
+			hash=$(echo -n "$guess" | sha256sum | awk '{print $1}')
+
+			if [ "$hash" == "$i" ]; then
+
+				printf "Password Found!\\n"
+				printf "Username: %s\\n" "${usernameArray[currentUserIndicator]}"
+				printf "Password: %s\\n" "$guess"
+
+				break
+
+			fi
+
+		done < "$1"
+
+		printf "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\n"
+
+		#Iterate current user index
+		currentUserIndicator=$((currentUserIndicator + 1))
+
+	done
+
+	return 0
+}
+
+
+
+bruteForceAttack()
+{
+	#Iterates through passwords array. If match is found, continues to the next element. Else it will continue to the next element regardless.
+	for i in "${passwordArray[@]}"; do
+
+		printf "User: %d\\n" "$((currentUserIndicator + 1))"
+
+		printf "Searching...\\n"
+
+		#resets timeout seconds to for every iteration of user
+		SECONDS=0
+
+		#timeout limit - 2 minutes
+		end=$((SECONDS+120))
+
+		while IFS= read -r guess; do 
+
+			hash=$(echo -n "$guess" | sha256sum | awk '{print $1}')
+
+			if [ "$hash" == "$i" ]; then
+
+				printf "Found a password!\\n"
+				printf "Username: %s\\n" "${usernameArray[currentUserIndicator]}"
+				printf "Password: %s\\n" "$guess"
+					
+				break
+					
+			fi
+
+			#Tests timeout
+			if [ "$SECONDS" -gt "$end" ]; then
+
+				printf "2 minute timeout... moving on to next user...\\n"
+
+				break 
+			fi
+
+		done < "$1"
+
+		printf "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\\n"			
+
+		#Iterate current user index
+		currentUserIndicator=$((currentUserIndicator + 1))
+
+	done
+
+	return 0
+}
